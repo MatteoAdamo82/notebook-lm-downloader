@@ -2,22 +2,22 @@
 
 ## Before modifying nbdl.py
 
-Read `nbdl.py.cdoc`. It documents the tensions (constraints that must not be broken) and the intended workflows.
+Read `nbdl.py.ctx`. It documents the tensions (constraints that must not be broken) and the intended workflows.
 
 ## Critical: the monkey-patch
 
-Lines 25-34 of `nbdl.py` patch `Notebook.from_api_response` to fix a bug in notebooklm-py (sources_count always returns 0). **Do not remove it** unless you've verified the upstream library has shipped the fix. Check `todos` in `nbdl.py.cdoc` for status.
+Lines 25-34 of `nbdl.py` patch `Notebook.from_api_response` to fix a bug in notebooklm-py (sources_count always returns 0). **Do not remove it** unless you've verified the upstream library has shipped the fix. Check `todos` in `nbdl.py.ctx` for status.
 
 ## Generating tests
 
 This project has no test suite yet. To generate one:
 
-> "Read `nbdl.py` and `nbdl.py.cdoc`. Implement the `conceptualTests` as pytest tests. Mock `NotebookLMClient` and its async methods."
+> "Read `nbdl.py` and `nbdl.py.ctx`. Implement the `conceptualTests` as pytest tests. Mock `NotebookLMClient` and its async methods."
 
 ## After modifying nbdl.py
 
 Run the sync prompt:
-> "I've modified `nbdl.py`. Read the updated file and `nbdl.py.cdoc` and tell me what needs updating in the `.cdoc`."
+> "I've modified `nbdl.py`. Read the updated file and `nbdl.py.ctx` and tell me what needs updating in the `.ctx`."
 
 ## Stack
 
