@@ -1,0 +1,3 @@
+notebooklm-py @ git+https://github.com/teng-lin/notebooklm-py.git
+rich>=13.0
+prompt_toolkit>=3.0

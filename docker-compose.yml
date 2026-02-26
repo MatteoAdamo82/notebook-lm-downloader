@@ -1,0 +1,14 @@
+services:
+  downloader:
+    build: .
+    image: notebook-lm-downloader
+    container_name: nbdl
+    volumes:
+      - ${OUTPUT_PATH:-./output}:/app/output
+      # Mount delle credenziali locali
+      - ${HOST_CREDENTIALS_PATH:-~/.notebooklm}:/root/.notebooklm
+    environment:
+      - TZ=${TZ:-Europe/Rome}
+      - NOTEBOOKLM_HOME=/root/.notebooklm
+    stdin_open: true # Necessario per input interattivo
+    tty: true        # Necessario per input interattivo

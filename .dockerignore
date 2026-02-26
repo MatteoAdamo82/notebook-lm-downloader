@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.env
+.venv
+output
+.DS_Store
+.git
+.gitignore
+README.md
+docker-compose.yml

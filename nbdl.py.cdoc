@@ -1,0 +1,62 @@
+purpose: "CLI tool to browse and download content (notes, sources, artifacts) from NotebookLM"
+
+tensions:
+  - "Monkey-patch on Notebook.from_api_response (top of file) fixes a bug in notebooklm-py where sources_count is always 0 — remove only when the upstream library ships the fix"
+  - "NotebookLMClient is used as `async with await client` — the double await is intentional, from_storage() returns a coroutine that itself returns an async context manager"
+  - "slugify caps at 80 chars — filesystem safety on all platforms, don't increase"
+  - "Sources are saved as both .json and .md — json for machine consumption, md for human readability; both are intentional"
+
+workflows:
+  main: "authenticate via from_storage() → list notebooks → pick_notebook (interactive) → create output/<slug>_<timestamp>/ → save notebook.json → download notes → sources → artifacts"
+  pick_notebook: "show table → prompt with autocomplete → try as number → try exact title match → try partial match → warn if multiple partials → loop until valid or cancelled"
+  download_artifact: "check kind → AUDIO → .mp3 | QUIZ/FLASHCARDS → .json | MIND_MAP → .json | unknown → skip (no error)"
+
+todos:
+  - "Remove monkey-patch when notebooklm-py fixes sources_count upstream"
+  - "Add --output flag to override the default output/ directory"
+  - "Consider --filter flag to download only notes, sources, or artifacts selectively"
+
+conceptualTests:
+  - name: "Notebook selection"
+    steps:
+      - action: "enter a valid number (e.g. '2')"
+        expect: "second notebook in the list is selected"
+      - action: "enter exact title (case-insensitive)"
+        expect: "matching notebook is selected"
+      - action: "enter partial title matching exactly one notebook"
+        expect: "that notebook is selected"
+      - action: "enter partial title matching multiple notebooks"
+        expect: "warning shown with all matches, prompt repeats"
+      - action: "enter a number out of range"
+        expect: "error shown, prompt repeats"
+      - action: "press Ctrl+C or Ctrl+D"
+        expect: "returns None, main prints 'Cancelled' and exits cleanly"
+
+  - name: "Empty states"
+    steps:
+      - action: "notebook has no notes"
+        expect: "'No notes found' message, no files created in notes/"
+      - action: "notebook has sources but none are ready"
+        expect: "'No sources ready' message, no files created in sources/"
+      - action: "notebook has no completed artifacts"
+        expect: "'No completed artifacts' message, no files created in artifacts/"
+
+  - name: "Download output structure"
+    steps:
+      - action: "run a full download on a notebook with title 'My Project'"
+        expect: "output directory is output/my_project_<YYYYMMDD_HHMMSS>/"
+      - action: "check output directory contents"
+        expect: "notebook.json present, notes/ sources/ artifacts/ created only if content exists"
+      - action: "download a source"
+        expect: "both <slug>.json and <slug>.md created with same base name"
+
+  - name: "Artifact types"
+    steps:
+      - action: "download AUDIO artifact"
+        expect: "<slug>.mp3 saved in artifacts/"
+      - action: "download QUIZ artifact"
+        expect: "<slug>.json saved in artifacts/"
+      - action: "download artifact of unknown type"
+        expect: "skipped silently, no file created, no crash"
+      - action: "artifact download fails with exception"
+        expect: "error printed for that artifact, remaining artifacts continue downloading"
